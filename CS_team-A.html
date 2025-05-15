@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Queue Registratio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f6fb;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      background-color: #002855;
+      color: white;
+      padding: 10px;
+    }
+
+    h1 {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 1.5em;
+      vertical-align: middle;
+    }
+
+    #main {
+      background-color: white;
+      margin: 30px auto;
+      padding: 20px;
+      width: 420px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+
+    input, button {
+      padding: 8px;
+      margin: 6px;
+      width: 70%;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+
+    button {
+      background-color: #ffc72c;
+      color: black;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ffdb5c;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #e8f0ff;
+      margin: 6px 0;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .timestamp {
+      font-size: 0.8em;
+      color: #666;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.8em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div id="main">
+  <h3>Join the Queue</h3>
+
+  <input type="text" id="nameInput" placeholder="Enter your name"><br>
+  <input type="text" id="studentIdInput" placeholder="Enter your student ID"><br>
+  <input type="text" id="purposeInput" placeholder="Enter your purpose"><br>
+
+  <button onclick="addToQueue()">Join Queue</button>
+
+  <h3>Current Queue</h3>
+  <ul id="queueDisplay"></ul>
+
+  <h3>Admin Control</h3>
+  <button onclick="removeFirst()">Remove First</button>
+</div>
+
+<footer>
+  PSHS - Caraga Region Campus | 9 - Barium
+</footer>
+
+<audio id="soundJoin" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
+<audio id="soundOut" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+
+<script>
+  let queueData = JSON.parse(localStorage.getItem("queueData")) || [];
+
+  function showQueue() {
+    let display = document.getElementById("queueDisplay");
+    display.innerHTML = "";
+    for (let i = 0; i < queueData.length; i++) {
+      let p = queueData[i];
+      let li = document.createElement("li");
+      li.innerHTML = (i+1) + `. ${p.name} (ID: ${p.studentId})<br>Purpose: ${p.purpose}<br><span class='timestamp'>(${p.time})</span>`;
+      display.appendChild(li);
+    }
+  }
+
+  function getTimeNow() {
+    let now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function addToQueue() {
+    let name = document.getElementById("nameInput").value.trim();
+    let studentId = document.getElementById("studentIdInput").value.trim();
+    let purpose = document.getElementById("purposeInput").value.trim();
+
+    if (!name || !studentId || !purpose) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    
+    let duplicate = queueData.find(p => p.name === name && p.purpose === purpose);
+    if (duplicate) {
+      alert("You're already in the queue for this purpose.");
+      return;
+    }
+
+    let person = {
+      name: name,
+      studentId: studentId,
+      purpose: purpose,
+      time: getTimeNow()
+    };
+
+    queueData.push(person);
+    localStorage.setItem("queueData", JSON.stringify(queueData));
+
+    document.getElementById("nameInput").value = "";
+    document.getElementById("studentIdInput").value = "";
+    document.getElementById("purposeInput").value = "";
+
+    showQueue();
+
+  }
+
+  function removeFirst() {
+    if (queueData.length === 0) {
+      alert("Queue is empty.");
+      return;
+    }
+
+    queueData.shift();
+    localStorage.setItem("queueData", JSON.stringify(queueData));
+    showQueue();
+
+  }
+
+  showQueue();
+</script>
+
+</body>
+</html>
